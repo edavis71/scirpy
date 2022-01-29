@@ -78,13 +78,12 @@ def group_abundance(
     if normalize:
         fraction_base = target_col if normalize is True else normalize
         title = "Fraction of " + target_col + " in each " + groupby
-        xlab = groupby
         ylab = "Fraction of cells in " + fraction_base
     else:
         title = "Number of cells in " + groupby + " by " + target_col
-        xlab = groupby
         ylab = "Number of cells"
 
+    xlab = groupby
     default_style_kws = {"title": title, "xlab": xlab, "ylab": ylab}
     if "style_kws" in kwargs:
         default_style_kws.update(kwargs["style_kws"])

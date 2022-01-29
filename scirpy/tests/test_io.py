@@ -37,8 +37,7 @@ def _read_anndata_from_10x_sample(path):
     fixtures. Therefore, we use the lru_cache instead.
     """
     print(f"Reading 10x file: {path}")
-    anndata = read_10x_vdj(path)
-    return anndata
+    return read_10x_vdj(path)
 
 
 @pytest.fixture
@@ -118,7 +117,7 @@ def test_airr_cell_empty():
     record"""
     ac = AirrCell("cell1")
     airr_record = list(ac.to_airr_records())
-    assert airr_record == []
+    assert not airr_record
 
     ac.to_scirpy_record()
 

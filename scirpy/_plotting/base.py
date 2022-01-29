@@ -66,11 +66,13 @@ def bar(
     ax = data.plot.bar(ax=ax, stacked=stacked, **kwargs)
 
     # Remove excess x label
-    if style_kws is not None:
-        if "xlab" in style_kws:
-            if "ylab" in style_kws:
-                if style_kws["xlab"] == style_kws["ylab"]:
-                    style_kws["xlab"] = ""
+    if (
+        style_kws is not None
+        and "xlab" in style_kws
+        and "ylab" in style_kws
+        and style_kws["xlab"] == style_kws["ylab"]
+    ):
+        style_kws["xlab"] = ""
 
     apply_style_to_axes(ax, style, style_kws)
     return ax
@@ -107,7 +109,7 @@ def line(
         kwargs["grid"] = False
     ax = data.plot.line(ax=ax, **kwargs)
     if style_kws is None:
-        style_kws = dict()
+        style_kws = {}
     style_kws["change_xticks"] = False
     apply_style_to_axes(ax, style, style_kws)
     return ax
@@ -213,7 +215,7 @@ def curve(
         order = list(data.keys())
 
     if kernel_kws is None:
-        kernel_kws = dict()
+        kernel_kws = {}
     if "kernel" not in kernel_kws:
         kernel_kws["kernel"] = "gaussian"
     if "bandwidth" not in kernel_kws:
@@ -235,13 +237,12 @@ def curve(
             fy = _i + 0
             _i = y.max()
             yticks.append(fy)
-        else:
-            if curve_layout == "stacked":
-                if i < 1:
-                    _y = np.zeros(len(y))
-                fy = _y[:]
-                _y = _y + y
-                y = fy + y
+        elif curve_layout == "stacked":
+            if i < 1:
+                _y = np.zeros(len(y))
+            fy = _y[:]
+            _y = _y + y
+            y = fy + y
         if shade:
             if outline:
                 ax.plot(x, y, label=label, color=tmp_color)
@@ -252,7 +253,7 @@ def curve(
             ax.plot(x, y, label=label, color=tmp_color)
 
     if style_kws is None:
-        style_kws = dict()
+        style_kws = {}
     style_kws["change_xticks"] = False
     if kde_norm:
         style_kws["ylab"] = "Probability"
@@ -305,7 +306,7 @@ def ol_scatter(
     ax.set_xlim(0, axlim)
     ax.set_ylim(0, axlim)
     if style_kws is None:
-        style_kws = dict()
+        style_kws = {}
     style_kws["change_xticks"] = False
     apply_style_to_axes(ax, style, style_kws)
     return ax
@@ -355,7 +356,7 @@ def volcano(
     ax.set_xlim(-axlim, axlim)
     ax.set_ylim(0, 1.1 * (data["y"].max()))
     if style_kws is None:
-        style_kws = dict()
+        style_kws = {}
     style_kws["change_xticks"] = False
     apply_style_to_axes(ax, style, style_kws)
     return ax

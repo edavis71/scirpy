@@ -129,7 +129,7 @@ def to_airr_cells(adata: AnnData) -> List[AirrCell]:
 
         for tmp_chain in chains.values():
             # Don't add empty chains!
-            if not all([_is_na2(x) for x in tmp_chain.values()]):
+            if not all(_is_na2(x) for x in tmp_chain.values()):
                 tmp_ir_cell.add_chain(tmp_chain)
 
         try:

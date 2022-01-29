@@ -43,11 +43,10 @@ def test_workflow(
     def _save_and_load(adata):
         """If save_intermediates is True, save the anndata to a temporary location
         and re-load it from disk."""
-        if save_intermediates:
-            adata.write_h5ad(tmp_path / "tmp_adata.h5ad")
-            return sc.read_h5ad(tmp_path / "tmp_adata.h5ad")
-        else:
+        if not save_intermediates:
             return adata
+        adata.write_h5ad(tmp_path / "tmp_adata.h5ad")
+        return sc.read_h5ad(tmp_path / "tmp_adata.h5ad")
 
     if upgrade_schema:
         adata = sc.read_h5ad(adata_path)

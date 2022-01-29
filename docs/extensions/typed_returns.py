@@ -7,8 +7,7 @@ from sphinx.ext.napoleon import NumpyDocstring
 
 def process_return(lines):
     for line in lines:
-        m = re.fullmatch(r"(?P<param>\w+)\s+:\s+(?P<type>[\w.]+)", line)
-        if m:
+        if m := re.fullmatch(r"(?P<param>\w+)\s+:\s+(?P<type>[\w.]+)", line):
             # Once this is in scanpydoc, we can use the fancy hover stuff
             yield f'**{m["param"]}** : :class:`~{m["type"]}`'
         else:

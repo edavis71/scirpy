@@ -137,15 +137,10 @@ def layout_fr_size_aware(
             raise ValueError(error_message)
 
         # 2) handle discrepancies in nodes listed in node_positions and nodes extracted from edge_list
-        if set(node_positions.keys()) == set(unique_nodes):
-            # all starting positions are given;
-            # no superfluous nodes in node_positions;
-            # nothing left to do
-            pass
-        else:
+        if set(node_positions.keys()) != set(unique_nodes):
             # some node positions are provided, but not all
             for node in unique_nodes:
-                if not (node in node_positions):
+                if node not in node_positions:
                     warnings.warn(
                         "Position of node {} not provided. Initializing to random position within frame.".format(
                             node
@@ -155,7 +150,7 @@ def layout_fr_size_aware(
 
             # unconnected_nodes = []
             for node in node_positions:
-                if not (node in unique_nodes):
+                if node not in unique_nodes:
                     # unconnected_nodes.append(node)
                     warnings.warn(
                         "Node {} appears to be unconnected. No position is computed for this node.".format(
@@ -175,9 +170,9 @@ def layout_fr_size_aware(
         is_mobile = np.ones((len(unique_nodes)), dtype=np.bool)
     else:
         is_mobile = np.array(
-            [False if node in fixed_nodes else True for node in unique_nodes],
-            dtype=np.bool,
+            [node not in fixed_nodes for node in unique_nodes], dtype=np.bool
         )
+
 
     adjacency = _edge_list_to_adjacency_matrix(edge_list)
 
@@ -195,7 +190,7 @@ def layout_fr_size_aware(
     # --------------------------------------------------------------------------------
     # main loop
 
-    for ii, temperature in enumerate(temperatures):
+    for temperature in temperatures:
         node_positions_as_array[is_mobile] = _fruchterman_reingold(
             adjacency,
             node_positions_as_array,

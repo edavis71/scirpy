@@ -65,9 +65,9 @@ class AirrCell(MutableMapping):
         # rather than the chain level
         self._cell_attribute_fields = cell_attribute_fields
         # storage for these values, accessible through MutableMapping interface
-        self._cell_attrs = dict()
+        self._cell_attrs = {}
         # A list of AIRR compliant dictionaries
-        self._chains = list()
+        self._chains = []
         self["cell_id"] = cell_id
         # legacy argument for the old AnnData scheme (when there was no `extra_chains` field)
         self["multi_chain"] = False

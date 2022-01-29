@@ -85,7 +85,7 @@ def cdr_convergence(
         plottable = plottable.drop("1", axis=1)
 
     if vizarg is None:
-        vizarg = dict()
+        vizarg = {}
 
     if group_order is None:
         group_order = plottable.index.values
@@ -117,16 +117,13 @@ def cdr_convergence(
         }
     }
 
-    # Check for settings in the profile and call the basic plotting function with merged arguments
     if viztype == "table":
         return plottable
+    if sizeprofile is None:
+        profile_args = _check_for_plotting_profile(adata)
     else:
-        if sizeprofile is None:
-            profile_args = _check_for_plotting_profile(adata)
-        else:
-            profile_args = _check_for_plotting_profile(sizeprofile)
-        main_args = dict(
-            dict(dict(profile_args, **kwds), **plot_router[viztype]["arg"]), **vizarg
-        )
-        axl = plot_router[viztype]["f"](**main_args)
-        return axl
+        profile_args = _check_for_plotting_profile(sizeprofile)
+    main_args = dict(
+        dict(dict(profile_args, **kwds), **plot_router[viztype]["arg"]), **vizarg
+    )
+    return plot_router[viztype]["f"](**main_args)

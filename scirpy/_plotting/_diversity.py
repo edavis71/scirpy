@@ -59,8 +59,7 @@ def alpha_diversity(
     }
     if "style_kws" in kwargs:
         default_style_kws.update(kwargs["style_kws"])
-    ax = base.bar(diversity, style_kws=default_style_kws, **kwargs)
     # commented out the line below to use default settings to
     # accommodate values from various metrics
     # ax.set_ylim(np.min(diversity.values) - 0.05, 1.0)
-    return ax
+    return base.bar(diversity, style_kws=default_style_kws, **kwargs)

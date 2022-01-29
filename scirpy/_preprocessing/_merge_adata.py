@@ -46,7 +46,7 @@ def merge_airr_chains(adata: AnnData, adata2: AnnData) -> None:
     """
     ir_objs1 = to_airr_cells(adata)
     ir_objs2 = to_airr_cells(adata2)
-    cell_dict: Dict[str, AirrCell] = dict()
+    cell_dict: Dict[str, AirrCell] = {}
     for cell in itertools.chain(ir_objs1, ir_objs2):
         try:
             tmp_cell = cell_dict[cell.cell_id]
@@ -63,7 +63,7 @@ def merge_airr_chains(adata: AnnData, adata2: AnnData) -> None:
     # remove duplicate chains
     # https://stackoverflow.com/questions/9427163/remove-duplicate-dict-in-list-in-python
     for cell in cell_dict.values():
-        cell._chains = [dict(t) for t in set(tuple(d.items()) for d in cell.chains)]
+        cell._chains = [dict(t) for t in {tuple(d.items()) for d in cell.chains}]
 
     # only keep entries that are in `adata` and ensure consistent ordering
     adata.obs = from_airr_cells(cell_dict.values()).obs.reindex(adata.obs_names)
@@ -111,8 +111,6 @@ def merge_with_ir(
         )
     if not adata.obs_names.is_unique:
         raise ValueError("obs names of `adata` need to be unique for merging.")
-    if not adata.obs_names.is_unique:
-        raise ValueError("obs_names of `adata_ir` need to be unique for merging.")
     if on is None and "batch" in adata.obs.columns and "batch" in adata_ir.obs.columns:
         on = ["batch"]
 
@@ -130,7 +128,7 @@ def merge_with_ir(
     adata.obs.index.name = "obs_names"
     adata_ir.obs.index.name = "obs_names"
     if on is None:
-        on = list()
+        on = []
     on.insert(0, "obs_names")
 
     adata.obs = adata.obs.merge(

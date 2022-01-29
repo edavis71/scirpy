@@ -302,17 +302,16 @@ def define_clonotype_clusters(
         "distances": clonotype_dist,
         "cell_indices": ctn.cell_indices,
     }
-    if inplace:
-        adata.obs[key_added] = clonotype_cluster_series
-        adata.obs[key_added + "_size"] = clonotype_cluster_size_series
-        adata.uns[key_added] = clonotype_distance_res
-        logging.info(f'Stored clonal assignments in `adata.obs["{key_added}"]`.')
-    else:
+    if not inplace:
         return (
             clonotype_cluster_series,
             clonotype_cluster_size_series,
             clonotype_distance_res,
         )
+    adata.obs[key_added] = clonotype_cluster_series
+    adata.obs[key_added + "_size"] = clonotype_cluster_size_series
+    adata.uns[key_added] = clonotype_distance_res
+    logging.info(f'Stored clonal assignments in `adata.obs["{key_added}"]`.')
 
 
 @_check_upgrade_schema()
@@ -467,7 +466,6 @@ def clonotype_network(
         raise ValueError(
             "The `size_aware` option is only compatible with the `components` layout."
         )
-    params_dict = dict()
     random.seed(random_state)
     np.random.seed(random_state)
 
@@ -513,16 +511,18 @@ def clonotype_network(
             ]
         )
     )
-    if len(subgraph_idx) == 0:
+    if not subgraph_idx:
         raise ValueError("No subgraphs with size >= {} found.".format(min_cells))
     graph = graph.subgraph(subgraph_idx)
 
     # Compute layout
     if layout_kwargs is None:
-        layout_kwargs = dict()
+        layout_kwargs = {}
     if layout == "components":
-        tmp_layout_kwargs = dict()
-        tmp_layout_kwargs["component_layout"] = "fr_size_aware" if size_aware else "fr"
+        tmp_layout_kwargs = {
+            'component_layout': "fr_size_aware" if size_aware else "fr"
+        }
+
         if size_aware:
             # layout kwargs for the fr_size_aware layout used for each component
             tmp_layout_kwargs["layout_kwargs"] = {
@@ -551,15 +551,16 @@ def clonotype_network(
         adata.obs_names
     )
 
-    # Store results or return
-    if inplace:
-        adata.obsm[f"X_{key_added}"] = coord_df
-        params_dict["clonotype_key"] = clonotype_key
-        params_dict["base_size"] = base_size
-        params_dict["size_power"] = size_power
-        adata.uns[key_added] = params_dict
-    else:
+    if not inplace:
         return coord_df
+    adata.obsm[f"X_{key_added}"] = coord_df
+    params_dict = {
+        'clonotype_key': clonotype_key,
+        'base_size': base_size,
+        'size_power': size_power,
+    }
+
+    adata.uns[key_added] = params_dict
 
 
 def _graph_from_coordinates(

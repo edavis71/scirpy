@@ -170,10 +170,7 @@ def vdj_usage(
     if full_combination:
         draw_mat = [list(vdj_cols)]
     else:
-        draw_mat = []
-        for lc in range(1, len(vdj_cols)):
-            draw_mat.append(vdj_cols[lc - 1 : lc + 1])
-
+        draw_mat = [vdj_cols[lc - 1 : lc + 1] for lc in range(1, len(vdj_cols))]
     # Draw ribbons
     for ribbon_start_x_coord, target_pair in enumerate(draw_mat, start=1):
         # Count occurance of individual VDJ combinations
@@ -303,9 +300,8 @@ def _gapped_ribbons(
 
     if ax is None:
         fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
-    else:
-        if isinstance(ax, list):
-            ax = ax[0]
+    elif isinstance(ax, list):
+        ax = ax[0]
 
     spread = 10
     xw = gapfreq - gapwidth

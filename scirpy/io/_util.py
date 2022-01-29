@@ -39,21 +39,21 @@ def _check_anndata_upgrade_schema(adata):
     """Check if `adata` uses the latest scirpy schema.
 
     Raises ValueError if it doesn't"""
-    if "has_ir" in adata.obs.columns:
-        # I would actually only use `scirpy_version` for the check, but
-        # there might be cases where it gets lost (e.g. when rebuilding AnnData).
-        # If a `v_call` is present, that's a safe sign that it is the AIRR schema, too
-        if (
+    if (
+        "has_ir" in adata.obs.columns
+        and (
             "IR_VJ_1_v_call" not in adata.obs.columns
             and "IR_VDJ_1_v_call" not in adata.obs.columns
-        ) and "scirpy_version" not in adata.uns:
-            raise ValueError(
-                "Scirpy has updated the the format of `adata.obs` in v0.7. "
-                "Please run `ir.io.upgrade_schema(adata)` to update your AnnData "
-                "object to the latest version. \n"
-                "If you are sure your schema is up-to-date, you can override "
-                "this message by setting `adata.uns['scirpy_version'] = '0.7'`"
-            )
+        )
+        and "scirpy_version" not in adata.uns
+    ):
+        raise ValueError(
+            "Scirpy has updated the the format of `adata.obs` in v0.7. "
+            "Please run `ir.io.upgrade_schema(adata)` to update your AnnData "
+            "object to the latest version. \n"
+            "If you are sure your schema is up-to-date, you can override "
+            "this message by setting `adata.uns['scirpy_version'] = '0.7'`"
+        )
 
 
 def _check_upgrade_schema(check_args=(0,)) -> Callable:

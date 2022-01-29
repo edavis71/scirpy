@@ -47,7 +47,7 @@ def layout_components(
 
     """
     if layout_kwargs is None:
-        layout_kwargs = dict()
+        layout_kwargs = {}
     # assign the original vertex id, it will otherwise get lost by decomposition
     for i, v in enumerate(graph.vs):
         v["id"] = i
@@ -73,9 +73,7 @@ def layout_components(
         _layout_component(component, bbox, component_layout, layout_kwargs)
         for component, bbox in zip(components, bboxes)
     ]
-    # get vertexes back into their original order
-    coords = np.vstack(component_layouts)[vertex_sorter, :]
-    return coords
+    return np.vstack(component_layouts)[vertex_sorter, :]
 
 
 def _bbox_rpack(component_sizes, pad_x=1.0, pad_y=1.0):
@@ -161,7 +159,7 @@ def _bbox_sorted(component_sizes, pad_x=1.0, pad_y=1.0):
     for n in component_sizes:
         width, height = _get_bbox_dimensions(n, power=0.8)
 
-        if not n == current_n:  # create a "new line"
+        if n != current_n:  # create a "new line"
             x = 0  # reset x
             y += height + pad_y  # shift y up
             current_n = n
@@ -185,8 +183,7 @@ def _layout_component(component, bbox, component_layout_func, layout_kwargs):
         coords = np.array(
             component.layout(component_layout_func, **layout_kwargs).coords
         )
-    rescaled_pos = _rescale_layout(coords, bbox)
-    return rescaled_pos
+    return _rescale_layout(coords, bbox)
 
 
 def _rescale_layout(coords, bbox):
@@ -194,16 +191,8 @@ def _rescale_layout(coords, bbox):
     min_x, min_y = np.min(coords, axis=0)
     max_x, max_y = np.max(coords, axis=0)
 
-    if not min_x == max_x:
-        delta_x = max_x - min_x
-    else:  # graph probably only has a single node
-        delta_x = 1.0
-
-    if not min_y == max_y:
-        delta_y = max_y - min_y
-    else:  # graph probably only has a single node
-        delta_y = 1.0
-
+    delta_x = max_x - min_x if min_x != max_x else 1.0
+    delta_y = max_y - min_y if min_y != max_y else 1.0
     new_min_x, new_min_y, new_delta_x, new_delta_y = bbox
 
     new_coords_x = (coords[:, 0] - min_x) / delta_x * new_delta_x + new_min_x

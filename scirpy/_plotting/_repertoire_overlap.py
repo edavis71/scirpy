@@ -158,34 +158,32 @@ def repertoire_overlap(
             valid_pairs = True
         except KeyError:
             pass
-        if valid_pairs:
-            if o_df.shape[1] == 2:
-                o_df = o_df.loc[(o_df.sum(axis=1) != 0), :]
-                o_df = o_df.groupby(pair_to_plot, observed=True).agg("size")
-                o_df = o_df.reset_index()
-                o_df.columns = ("x", "y", "z")
-                o_df["z"] -= o_df["z"].min()
-                o_df["z"] /= o_df["z"].max()
-                o_df["z"] += 0.05
-                o_df["z"] *= 1000
-
-                # Create text for default labels
-                p_a, p_b = pair_to_plot
-                default_style_kws = {
-                    "title": "Repertoire overlap between " + p_a + " and " + p_b,
-                    "xlab": "Clonotype size in " + p_a,
-                    "ylab": "Clonotype size in " + p_b,
-                }
-                if "style_kws" in kwargs:
-                    default_style_kws.update(kwargs["style_kws"])
-                kwargs["style_kws"] = default_style_kws
-                ax = ol_scatter(o_df, **kwargs)
-            else:
-                raise ValueError(
-                    "Wrong number of members. A pair is exactly two items! "
-                    + invalid_pair_warning
-                )
-        else:
+        if not valid_pairs:
             raise ValueError(invalid_pair_warning)
 
+        if o_df.shape[1] != 2:
+            raise ValueError(
+                "Wrong number of members. A pair is exactly two items! "
+                + invalid_pair_warning
+            )
+        o_df = o_df.loc[(o_df.sum(axis=1) != 0), :]
+        o_df = o_df.groupby(pair_to_plot, observed=True).agg("size")
+        o_df = o_df.reset_index()
+        o_df.columns = ("x", "y", "z")
+        o_df["z"] -= o_df["z"].min()
+        o_df["z"] /= o_df["z"].max()
+        o_df["z"] += 0.05
+        o_df["z"] *= 1000
+
+        # Create text for default labels
+        p_a, p_b = pair_to_plot
+        default_style_kws = {
+            "title": "Repertoire overlap between " + p_a + " and " + p_b,
+            "xlab": "Clonotype size in " + p_a,
+            "ylab": "Clonotype size in " + p_b,
+        }
+        if "style_kws" in kwargs:
+            default_style_kws.update(kwargs["style_kws"])
+        kwargs["style_kws"] = default_style_kws
+        ax = ol_scatter(o_df, **kwargs)
     return ax

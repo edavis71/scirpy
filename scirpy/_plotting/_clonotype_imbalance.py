@@ -83,9 +83,9 @@ def clonotype_imbalance(
 
     if key_added not in adata.uns:
         sc.logging.warning(
-            f"Clonotype imbalance not found."
-            " Running `ir.tl.clonotype_imbalance` and storing under {key_added}"
+            'Clonotype imbalance not found. Running `ir.tl.clonotype_imbalance` and storing under {key_added}'
         )
+
 
         tl.clonotype_imbalance(
             adata,
@@ -141,12 +141,11 @@ def clonotype_imbalance(
             )  # Melt is undoing pivot, but after pivot, we also get the zero freqs
             if plot_type == "box":
                 ax = sns.boxplot(**tclt_kws)
+            elif plot_type == "bar":
+                ax = sns.barplot(**tclt_kws)
             else:
-                if plot_type == "bar":
-                    ax = sns.barplot(**tclt_kws)
-                else:
-                    tclt_kws.update(kwargs)
-                    ax = sns.stripplot(**tclt_kws)
+                tclt_kws.update(kwargs)
+                ax = sns.stripplot(**tclt_kws)
 
         else:
             tclt_df = tclt_df.pivot_table(

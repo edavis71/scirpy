@@ -46,11 +46,7 @@ def spectratype(
             "`groupby` not found in obs. Where do you store CDR3 length information?"
         )
 
-    if isinstance(groupby, str):
-        groupby = [groupby]
-    else:
-        groupby = list(set(groupby))
-
+    groupby = [groupby] if isinstance(groupby, str) else list(set(groupby))
     # Remove NAs
     ir_obs = adata.obs.loc[~np.any(_is_na(adata.obs[groupby].values), axis=1), :].copy()
 
