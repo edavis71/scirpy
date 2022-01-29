@@ -28,11 +28,10 @@ def apply_style_to_axes(
         override the defaults provided by the style.
     """
     if style is not None:
-        style_kws = dict() if style_kws is None else style_kws
-        if style == "default":
-            return style_axes(ax, **style_kws)
-        else:
+        if style != "default":
             raise ValueError("Unknown style: {}".format(style))
+        style_kws = dict() if style_kws is None else style_kws
+        return style_axes(ax, **style_kws)
 
 
 def _init_ax(fig_kws: Union[dict, None] = None) -> plt.Axes:
@@ -145,4 +144,4 @@ def _get_colors(
     else:
         _validate_palette(adata, obs_key)
 
-    return {cat: col for cat, col in zip(values.categories, adata.uns[color_key])}
+    return dict(zip(values.categories, adata.uns[color_key]))

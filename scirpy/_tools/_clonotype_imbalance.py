@@ -149,14 +149,11 @@ def clonotype_imbalance(
     )
     clt_stats = clt_stats.sort_values(by="pValue")
 
-    if inplace:
-
-        # Store calculated data
-        adata.uns[key_added] = {"abundance": clt_freq, "pvalues": clt_stats}
-        return
-
-    else:
+    if not inplace:
         return clt_freq, clt_stats
+    # Store calculated data
+    adata.uns[key_added] = {"abundance": clt_freq, "pvalues": clt_stats}
+    return
 
 
 def _create_case_control_groups(
@@ -204,10 +201,7 @@ def _create_case_control_groups(
     df = df.groupby(group_cols, observed=True).agg("size").reset_index()
 
     for hue in hues:
-        if hue is None:
-            tdf = df
-        else:
-            tdf = df.loc[df[additional_hue] == hue, :]
+        tdf = df if hue is None else df.loc[df[additional_hue] == hue, :]
         cases = tdf.loc[df[groupby] == case_label, :]
         ncase = cases[0]
         cases = cases[replicate_col]
@@ -261,13 +255,11 @@ def _calculate_imbalance(
     case_mean_freq = np.mean((case_sizes) / np.array(ncase))
     case_presence = case_sizes.sum()
     case_absence = ncase.sum() - case_presence
-    if case_absence < 0:
-        case_absence = 0
+    case_absence = max(case_absence, 0)
     control_mean_freq = np.mean((control_sizes) / np.array(ncontrol))
     control_presence = control_sizes.sum()
     control_absence = ncontrol.sum() - control_presence
-    if control_absence < 0:
-        control_absence = 0
+    control_absence = max(control_absence, 0)
     oddsratio, p = fisher_exact(
         [[case_presence, control_presence], [case_absence, control_absence]]
     )

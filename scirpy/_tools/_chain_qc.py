@@ -157,13 +157,12 @@ def chain_qc(
         adata, res_receptor_subtype == "ambiguous", mask_has_ir, mask_multichain
     )
 
-    if inplace:
-        col_receptor_type, col_receptor_subtype, col_chain_pairing = key_added
-        adata.obs[col_receptor_type] = res_receptor_type
-        adata.obs[col_receptor_subtype] = res_receptor_subtype
-        adata.obs[col_chain_pairing] = res_chain_pairing
-    else:
+    if not inplace:
         return (res_receptor_type, res_receptor_subtype, res_chain_pairing)
+    col_receptor_type, col_receptor_subtype, col_chain_pairing = key_added
+    adata.obs[col_receptor_type] = res_receptor_type
+    adata.obs[col_receptor_subtype] = res_receptor_subtype
+    adata.obs[col_chain_pairing] = res_chain_pairing
 
 
 def _chain_pairing(

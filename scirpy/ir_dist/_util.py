@@ -102,7 +102,7 @@ class ReverseLookupTable:
             raise ValueError("invalid dist_type")
         self.dist_type = dist_type
         self.size = size
-        self.lookup: Dict[Hashable, sp.coo_matrix] = dict()
+        self.lookup: Dict[Hashable, sp.coo_matrix] = {}
 
     @staticmethod
     def from_dict_of_indices(
@@ -190,12 +190,12 @@ class DoubleLookupNeighborFinder:
         # n_feature x n_feature sparse, symmetric distance matrices
         self.distance_matrices: Dict[str, sp.csr_matrix] = dict()
         # mapping feature_label -> feature_index with len = n_feature
-        self.distance_matrix_labels: Dict[str, dict] = dict()
+        self.distance_matrix_labels: Dict[str, dict] = {}
         # tuples (dist_mat, forward, reverse)
         # dist_mat: name of associated distance matrix
         # forward: clonotype -> feature_index lookups
         # reverse: feature_index -> clonotype lookups
-        self.lookups: Dict[str, Tuple[str, np.ndarray, ReverseLookupTable]] = dict()
+        self.lookups: Dict[str, Tuple[str, np.ndarray, ReverseLookupTable]] = {}
 
     @property
     def n_rows(self):
@@ -245,24 +245,22 @@ class DoubleLookupNeighborFinder:
         idx_in_dist_mat = forward[object_id]
         if np.isnan(idx_in_dist_mat):
             return reverse.empty()
-        else:
-            # get distances from the distance matrix...
-            row = distance_matrix[idx_in_dist_mat, :]
+        # get distances from the distance matrix...
+        row = distance_matrix[idx_in_dist_mat, :]
 
-            if reverse.is_boolean:
-                assert (
-                    len(row.indices) == 1  # type: ignore
-                ), "Boolean reverse lookup only works for identity distance matrices."
-                return reverse[row.indices[0]]  # type: ignore
-            else:
-                # ... and get column indices directly from sparse row
-                # sum concatenates coo matrices
-                return merge_coo_matrices(
-                    (
-                        reverse[i] * multiplier
-                        for i, multiplier in zip(row.indices, row.data)  # type: ignore
-                    )
-                )  # type: ignore
+        if not reverse.is_boolean:
+            # ... and get column indices directly from sparse row
+            # sum concatenates coo matrices
+            return merge_coo_matrices(
+                (
+                    reverse[i] * multiplier
+                    for i, multiplier in zip(row.indices, row.data)  # type: ignore
+                )
+            )  # type: ignore
+        assert (
+            len(row.indices) == 1  # type: ignore
+        ), "Boolean reverse lookup only works for identity distance matrices."
+        return reverse[row.indices[0]]  # type: ignore
 
     def add_distance_matrix(
         self, name: str, distance_matrix: sp.csr_matrix, labels: Sequence
@@ -340,7 +338,7 @@ class DoubleLookupNeighborFinder:
         If the dist_type is numeric, will use a sparse numeric matrix.
         If the dist_type is boolean, use a dense boolean.
         """
-        tmp_reverse_lookup = dict()
+        tmp_reverse_lookup = {}
         tmp_index_lookup = self.distance_matrix_labels[distance_matrix]
 
         # Build reverse lookup

@@ -28,12 +28,11 @@ def test_dict():
 
 @pytest.fixture
 def adata_obs():
-    adata = AnnData(
+    return AnnData(
         obs=pd.DataFrame().assign(
             col1=["foo", "foo", "bar", "bar"], col2=["foo", "nan", "xxx", "nan"]
         )
     )
-    return adata
 
 
 def test_get_color(adata_obs):

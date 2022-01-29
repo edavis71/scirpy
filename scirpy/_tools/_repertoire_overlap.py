@@ -89,16 +89,13 @@ def repertoire_overlap(
     distM = sc_distance.pdist(pr_df, overlap_measure)
     linkage = sc_hierarchy.linkage(distM)
 
-    if inplace:
-
-        # Store calculated data
-        adata.uns[added_key] = {
-            "weighted": df,
-            "distance": distM,
-            "linkage": linkage,
-        }
-
-        return
-
-    else:
+    if not inplace:
         return df, distM, linkage
+    # Store calculated data
+    adata.uns[added_key] = {
+        "weighted": df,
+        "distance": distM,
+        "linkage": linkage,
+    }
+
+    return

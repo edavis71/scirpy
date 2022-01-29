@@ -138,22 +138,18 @@ def _get_sparse_from_igraph(graph, *, simplified, weight_attr=None):
     Square adjacency matrix. If the graph was directed, the matrix will be symmetric.
     """
     edges = graph.get_edgelist()
-    if weight_attr is None:
-        weights = [1] * len(edges)
-    else:
-        weights = graph.es[weight_attr]
+    weights = [1] * len(edges) if weight_attr is None else graph.es[weight_attr]
     shape = graph.vcount()
     shape = (shape, shape)
-    if len(edges) > 0:
-        adj_mat = csr_matrix((weights, zip(*edges)), shape=shape)
-        if simplified:
-            # make symmetrical and add diagonal
-            adj_mat = (
-                adj_mat
-                + adj_mat.T
-                - sparse.diags(adj_mat.diagonal())
-                + sparse.diags(np.ones(adj_mat.shape[0]))
-            )
-        return adj_mat
-    else:
+    if len(edges) <= 0:
         return csr_matrix(shape)
+    adj_mat = csr_matrix((weights, zip(*edges)), shape=shape)
+    if simplified:
+        # make symmetrical and add diagonal
+        adj_mat = (
+            adj_mat
+            + adj_mat.T
+            - sparse.diags(adj_mat.diagonal())
+            + sparse.diags(np.ones(adj_mat.shape[0]))
+        )
+    return adj_mat

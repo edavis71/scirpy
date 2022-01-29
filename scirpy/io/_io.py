@@ -71,7 +71,7 @@ def _read_10x_vdj_json(path: Union[str, Path], filtered: bool = True) -> AnnData
         # AIRR-compliant chain dict
         chain = AirrCell.empty_chain_dict()
 
-        genes = dict()
+        genes = {}
         mapping = {
             "L-REGION+V-REGION": "v",
             "D-REGION": "d",
@@ -83,11 +83,12 @@ def _read_10x_vdj_json(path: Union[str, Path], filtered: bool = True) -> AnnData
             if feat["region_type"] in mapping:
                 region = mapping[feat["region_type"]]
                 assert region not in genes, region
-                genes[region] = dict()
-                genes[region]["chain"] = feat["chain"]
-                genes[region]["gene"] = feat["gene_name"]
-                genes[region]["start"] = annot["contig_match_start"]
-                genes[region]["end"] = annot["contig_match_end"]
+                genes[region] = {
+                    'chain': feat["chain"],
+                    'gene': feat["gene_name"],
+                    'start': annot["contig_match_start"],
+                    'end': annot["contig_match_end"],
+                }
 
         chain["v_call"] = genes["v"]["gene"] if "v" in genes else None
         chain["d_call"] = genes["d"]["gene"] if "d" in genes else None
@@ -453,23 +454,21 @@ def _infer_locus_from_gene_names(chain_dict):
         if t == "" or t is None or t != t:
             tmp.remove(t)
     if all("tra" in x.lower() for x in tmp if not pd.isnull(x)):
-        locus = "TRA"
+        return "TRA"
     elif all("trb" in x.lower() for x in tmp if not pd.isnull(x)):
-        locus = "TRB"
+        return "TRB"
     elif all("trd" in x.lower() for x in tmp if not pd.isnull(x)):
-        locus = "TRD"
+        return "TRD"
     elif all("trg" in x.lower() for x in tmp if not pd.isnull(x)):
-        locus = "TRG"
+        return "TRG"
     elif all("igh" in x.lower() for x in tmp if not pd.isnull(x)):
-        locus = "IGH"
+        return "IGH"
     elif all("igk" in x.lower() for x in tmp if not pd.isnull(x)):
-        locus = "IGK"
+        return "IGK"
     elif all("igl" in x.lower() for x in tmp if not pd.isnull(x)):
-        locus = "IGL"
+        return "IGL"
     else:
-        locus = None
-
-    return locus
+        return None
 
 
 @_doc_params(doc_working_model=doc_working_model)
@@ -495,7 +494,7 @@ def read_bracer(path: Union[str, Path]) -> AnnData:
     logger = _IOLogger()
     changeodb = pd.read_csv(path, sep="\t", na_values=["None"])
 
-    bcr_cells = dict()
+    bcr_cells = {}
     for _, row in changeodb.iterrows():
         cell_id = row["CELL"]
         try:
